@@ -14,16 +14,470 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      announcements: {
+        Row: {
+          body: string
+          created_at: string
+          created_by: string
+          id: string
+          title: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          created_by: string
+          id?: string
+          title: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      applications: {
+        Row: {
+          created_at: string
+          id: string
+          job_id: string
+          notes: string | null
+          status: Database["public"]["Enums"]["application_status"]
+          student_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          job_id: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["application_status"]
+          student_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          job_id?: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["application_status"]
+          student_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ats_reports: {
+        Row: {
+          created_at: string
+          id: string
+          job_description: string
+          job_title: string | null
+          matching_skills: string[] | null
+          missing_skills: string[] | null
+          recommendations: string[] | null
+          score: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          job_description: string
+          job_title?: string | null
+          matching_skills?: string[] | null
+          missing_skills?: string[] | null
+          recommendations?: string[] | null
+          score: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          job_description?: string
+          job_title?: string | null
+          matching_skills?: string[] | null
+          missing_skills?: string[] | null
+          recommendations?: string[] | null
+          score?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      coordinator_profiles: {
+        Row: {
+          college: string | null
+          created_at: string
+          department: string | null
+          designation: string | null
+          onboarded: boolean
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          college?: string | null
+          created_at?: string
+          department?: string | null
+          designation?: string | null
+          onboarded?: boolean
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          college?: string | null
+          created_at?: string
+          department?: string | null
+          designation?: string | null
+          onboarded?: boolean
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      jobs: {
+        Row: {
+          company: string
+          created_at: string
+          created_by: string
+          ctc: string | null
+          deadline: string | null
+          description: string | null
+          eligible_departments: string[] | null
+          id: string
+          location: string | null
+          min_cgpa: number | null
+          published: boolean
+          required_skills: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          company: string
+          created_at?: string
+          created_by: string
+          ctc?: string | null
+          deadline?: string | null
+          description?: string | null
+          eligible_departments?: string[] | null
+          id?: string
+          location?: string | null
+          min_cgpa?: number | null
+          published?: boolean
+          required_skills?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          company?: string
+          created_at?: string
+          created_by?: string
+          ctc?: string | null
+          deadline?: string | null
+          description?: string | null
+          eligible_departments?: string[] | null
+          id?: string
+          location?: string | null
+          min_cgpa?: number | null
+          published?: boolean
+          required_skills?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          link: string | null
+          read: boolean
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read?: boolean
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read?: boolean
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      quiz_attempts: {
+        Row: {
+          answers: Json | null
+          created_at: string
+          id: string
+          quiz_id: string
+          score: number
+          student_id: string
+          total: number
+        }
+        Insert: {
+          answers?: Json | null
+          created_at?: string
+          id?: string
+          quiz_id: string
+          score?: number
+          student_id: string
+          total?: number
+        }
+        Update: {
+          answers?: Json | null
+          created_at?: string
+          id?: string
+          quiz_id?: string
+          score?: number
+          student_id?: string
+          total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_attempts_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quiz_questions: {
+        Row: {
+          correct_index: number
+          id: string
+          options: string[]
+          position: number
+          question: string
+          quiz_id: string
+        }
+        Insert: {
+          correct_index: number
+          id?: string
+          options: string[]
+          position?: number
+          question: string
+          quiz_id: string
+        }
+        Update: {
+          correct_index?: number
+          id?: string
+          options?: string[]
+          position?: number
+          question?: string
+          quiz_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_questions_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quizzes: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          duration_minutes: number
+          id: string
+          published: boolean
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          duration_minutes?: number
+          id?: string
+          published?: boolean
+          title: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          duration_minutes?: number
+          id?: string
+          published?: boolean
+          title?: string
+        }
+        Relationships: []
+      }
+      resumes: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_path: string
+          id: string
+          is_active: boolean
+          parsed: Json | null
+          raw_text: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          file_path: string
+          id?: string
+          is_active?: boolean
+          parsed?: Json | null
+          raw_text?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          id?: string
+          is_active?: boolean
+          parsed?: Json | null
+          raw_text?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      student_profiles: {
+        Row: {
+          cgpa: number | null
+          created_at: string
+          department: string | null
+          github_url: string | null
+          graduation_year: number | null
+          linkedin_url: string | null
+          onboarded: boolean
+          phone: string | null
+          skills: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cgpa?: number | null
+          created_at?: string
+          department?: string | null
+          github_url?: string | null
+          graduation_year?: number | null
+          linkedin_url?: string | null
+          onboarded?: boolean
+          phone?: string | null
+          skills?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cgpa?: number | null
+          created_at?: string
+          department?: string | null
+          github_url?: string | null
+          graduation_year?: number | null
+          linkedin_url?: string | null
+          onboarded?: boolean
+          phone?: string | null
+          skills?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "student" | "coordinator"
+      application_status:
+        | "applied"
+        | "under_review"
+        | "shortlisted"
+        | "interview_scheduled"
+        | "selected"
+        | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +604,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["student", "coordinator"],
+      application_status: [
+        "applied",
+        "under_review",
+        "shortlisted",
+        "interview_scheduled",
+        "selected",
+        "rejected",
+      ],
+    },
   },
 } as const
