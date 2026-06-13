@@ -19,7 +19,7 @@ import NotFound from "./pages/NotFound";
 // Student
 import StudentDashboard from "./pages/student/Dashboard";
 import StudentProfile from "./pages/student/Profile";
-import Resume from "./pages/student/Resume";
+
 import ATS from "./pages/student/ATS";
 import StudentJobs from "./pages/student/Jobs";
 import StudentApplications from "./pages/student/Applications";
@@ -57,7 +57,7 @@ const App = () => (
             <Route path="/student" element={<ProtectedRoute requireRole="student"><AppShell variant="student" /></ProtectedRoute>}>
               <Route index element={<StudentDashboard />} />
               <Route path="profile" element={<StudentProfile />} />
-              <Route path="resume" element={<Resume />} />
+              
               <Route path="ats" element={<ATS />} />
               <Route path="jobs" element={<StudentJobs />} />
               <Route path="applications" element={<StudentApplications />} />

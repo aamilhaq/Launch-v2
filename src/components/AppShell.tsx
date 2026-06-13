@@ -3,14 +3,13 @@ import { useAuth } from "@/lib/auth";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import {
-  LayoutDashboard, FileText, Target, Briefcase, GraduationCap,
-  BarChart3, Megaphone, Users, ClipboardList, LogOut, BellRing, UserCircle,
+  LayoutDashboard, Target, Briefcase, GraduationCap,
+  BarChart3, Megaphone, Users, ClipboardList, LogOut, UserCircle,
 } from "lucide-react";
 
 const studentNav = [
   { to: "/student", icon: LayoutDashboard, label: "Dashboard", end: true },
   { to: "/student/profile", icon: UserCircle, label: "Profile" },
-  { to: "/student/resume", icon: FileText, label: "Resume" },
   { to: "/student/ats", icon: Target, label: "ATS Checker" },
   { to: "/student/jobs", icon: Briefcase, label: "Jobs" },
   { to: "/student/applications", icon: ClipboardList, label: "Applications" },
