@@ -21,9 +21,12 @@ const Signup = () => {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!/^[^\s@]+@[^\s@]+\.edu\.in$/i.test(email.trim())) {
+      return toast.error("Please use your university email ending in .edu.in");
+    }
     setLoading(true);
     const { error } = await supabase.auth.signUp({
-      email,
+      email: email.trim(),
       password,
       options: {
         emailRedirectTo: window.location.origin,
@@ -81,8 +84,9 @@ const Signup = () => {
                 <Input id="name" required value={fullName} onChange={(e) => setFullName(e.target.value)} className="mt-1.5" />
               </div>
               <div>
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1.5" />
+                <Label htmlFor="email">University email</Label>
+                <Input id="email" type="email" required placeholder="you@college.edu.in" pattern="^[^\s@]+@[^\s@]+\.edu\.in$" title="Use your .edu.in university email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1.5" />
+                <p className="text-xs text-muted-foreground mt-1">Only university emails ending in <span className="font-medium">.edu.in</span> are allowed.</p>
               </div>
               <div>
                 <Label htmlFor="pw">Password</Label>
