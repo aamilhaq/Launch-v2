@@ -401,11 +401,15 @@ export type Database = {
           cgpa: number | null
           created_at: string
           department: string | null
+          extracted_skills: string[] | null
+          extraction_timestamp: string | null
           github_url: string | null
           graduation_year: number | null
           linkedin_url: string | null
           onboarded: boolean
           phone: string | null
+          resume_last_updated: string | null
+          resume_url: string | null
           skills: string[] | null
           updated_at: string
           user_id: string
@@ -414,11 +418,15 @@ export type Database = {
           cgpa?: number | null
           created_at?: string
           department?: string | null
+          extracted_skills?: string[] | null
+          extraction_timestamp?: string | null
           github_url?: string | null
           graduation_year?: number | null
           linkedin_url?: string | null
           onboarded?: boolean
           phone?: string | null
+          resume_last_updated?: string | null
+          resume_url?: string | null
           skills?: string[] | null
           updated_at?: string
           user_id: string
@@ -427,11 +435,15 @@ export type Database = {
           cgpa?: number | null
           created_at?: string
           department?: string | null
+          extracted_skills?: string[] | null
+          extraction_timestamp?: string | null
           github_url?: string | null
           graduation_year?: number | null
           linkedin_url?: string | null
           onboarded?: boolean
           phone?: string | null
+          resume_last_updated?: string | null
+          resume_url?: string | null
           skills?: string[] | null
           updated_at?: string
           user_id?: string
