@@ -3,8 +3,8 @@ import { useAuth } from "@/lib/auth";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import {
-  LayoutDashboard, FileText, Target, Briefcase, GraduationCap,
-  BarChart3, Megaphone, Users, ClipboardList, LogOut, BellRing, UserCircle,
+  LayoutDashboard, Target, Briefcase, GraduationCap,
+  BarChart3, Megaphone, Users, ClipboardList, LogOut, UserCircle,
 } from "lucide-react";
 
 const studentNav = [
