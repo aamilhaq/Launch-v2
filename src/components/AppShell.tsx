@@ -10,7 +10,6 @@ import {
 const studentNav = [
   { to: "/student", icon: LayoutDashboard, label: "Dashboard", end: true },
   { to: "/student/profile", icon: UserCircle, label: "Profile" },
-  { to: "/student/resume", icon: FileText, label: "Resume" },
   { to: "/student/ats", icon: Target, label: "ATS Checker" },
   { to: "/student/jobs", icon: Briefcase, label: "Jobs" },
   { to: "/student/applications", icon: ClipboardList, label: "Applications" },
