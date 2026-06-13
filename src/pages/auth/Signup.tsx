@@ -21,9 +21,12 @@ const Signup = () => {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!/^[^\s@]+@[^\s@]+\.edu\.in$/i.test(email.trim())) {
+      return toast.error("Please use your university email ending in .edu.in");
+    }
     setLoading(true);
     const { error } = await supabase.auth.signUp({
-      email,
+      email: email.trim(),
       password,
       options: {
         emailRedirectTo: window.location.origin,
