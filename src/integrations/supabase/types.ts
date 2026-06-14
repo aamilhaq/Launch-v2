@@ -154,6 +154,7 @@ export type Database = {
       }
       jobs: {
         Row: {
+          auto_shortlist_top_n: number | null
           company: string
           created_at: string
           created_by: string
@@ -165,11 +166,13 @@ export type Database = {
           location: string | null
           min_cgpa: number | null
           published: boolean
+          rank_by_match: boolean
           required_skills: string[] | null
           title: string
           updated_at: string
         }
         Insert: {
+          auto_shortlist_top_n?: number | null
           company: string
           created_at?: string
           created_by: string
@@ -181,11 +184,13 @@ export type Database = {
           location?: string | null
           min_cgpa?: number | null
           published?: boolean
+          rank_by_match?: boolean
           required_skills?: string[] | null
           title: string
           updated_at?: string
         }
         Update: {
+          auto_shortlist_top_n?: number | null
           company?: string
           created_at?: string
           created_by?: string
@@ -197,6 +202,7 @@ export type Database = {
           location?: string | null
           min_cgpa?: number | null
           published?: boolean
+          rank_by_match?: boolean
           required_skills?: string[] | null
           title?: string
           updated_at?: string
