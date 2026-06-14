@@ -7,12 +7,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { PageHeader, EmptyState } from "@/components/ui-bits";
 import { Briefcase, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { DEPARTMENTS } from "@/lib/departments";
 
-const blank = { company: "", title: "", description: "", location: "", ctc: "", required_skills: "", min_cgpa: "", eligible_departments: "", deadline: "", published: true };
+const blank = {
+  company: "", title: "", description: "", location: "", ctc: "",
+  required_skills: "", min_cgpa: "",
+  eligible_departments: [] as string[],
+  deadline: "", published: true,
+  rank_by_match: true,
+  auto_shortlist_enabled: false,
+  auto_shortlist_top_n: "20",
+};
 
 const CoordJobs = () => {
   const { user } = useAuth();
@@ -26,16 +37,28 @@ const CoordJobs = () => {
   };
   useEffect(() => { load(); }, []);
 
+  const toggleDept = (d: string) => {
+    setF((prev) => ({
+      ...prev,
+      eligible_departments: prev.eligible_departments.includes(d)
+        ? prev.eligible_departments.filter((x) => x !== d)
+        : [...prev.eligible_departments, d],
+    }));
+  };
+
   const save = async () => {
     if (!user) return;
     if (!f.company || !f.title) return toast.error("Company and title required");
+    const topN = f.auto_shortlist_enabled ? Math.max(1, parseInt(f.auto_shortlist_top_n || "0", 10) || 0) : null;
     const { error } = await supabase.from("jobs").insert({
       created_by: user.id, company: f.company, title: f.title, description: f.description,
       location: f.location, ctc: f.ctc,
       required_skills: f.required_skills.split(",").map((s) => s.trim()).filter(Boolean),
       min_cgpa: f.min_cgpa ? Number(f.min_cgpa) : 0,
-      eligible_departments: f.eligible_departments.split(",").map((s) => s.trim()).filter(Boolean),
+      eligible_departments: f.eligible_departments,
       deadline: f.deadline || null, published: f.published,
+      rank_by_match: f.rank_by_match,
+      auto_shortlist_top_n: topN,
     });
     if (error) return toast.error(error.message);
     toast.success("Job posted");
@@ -53,7 +76,7 @@ const CoordJobs = () => {
       <PageHeader title="Job postings" subtitle="Create and manage open roles for students."
         action={<Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild><Button className="bg-grad-primary"><Plus className="h-4 w-4 mr-2" />New job</Button></DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader><DialogTitle>Post a new job</DialogTitle></DialogHeader>
             <div className="grid md:grid-cols-2 gap-3">
               <div><Label>Company</Label><Input value={f.company} onChange={(e) => setF({ ...f, company: e.target.value })} /></div>
@@ -64,7 +87,38 @@ const CoordJobs = () => {
               <div><Label>Min CGPA</Label><Input type="number" step="0.1" value={f.min_cgpa} onChange={(e) => setF({ ...f, min_cgpa: e.target.value })} /></div>
               <div><Label>Deadline</Label><Input type="date" value={f.deadline} onChange={(e) => setF({ ...f, deadline: e.target.value })} /></div>
               <div className="md:col-span-2"><Label>Required skills (comma-separated)</Label><Input value={f.required_skills} onChange={(e) => setF({ ...f, required_skills: e.target.value })} /></div>
-              <div className="md:col-span-2"><Label>Eligible departments (comma-separated)</Label><Input placeholder="Computer Science, IT" value={f.eligible_departments} onChange={(e) => setF({ ...f, eligible_departments: e.target.value })} /></div>
+              <div className="md:col-span-2">
+                <Label>Eligible departments</Label>
+                <div className="mt-2 grid grid-cols-2 gap-2 p-3 rounded-md border border-border">
+                  {DEPARTMENTS.map((d) => (
+                    <label key={d} className="flex items-center gap-2 text-sm cursor-pointer">
+                      <Checkbox checked={f.eligible_departments.includes(d)} onCheckedChange={() => toggleDept(d)} />
+                      {d}
+                    </label>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Leave all unchecked to allow every department.</p>
+              </div>
+
+              <div className="md:col-span-2 rounded-md border border-border p-3 space-y-3">
+                <div className="text-sm font-medium">Shortlisting</div>
+                <label className="flex items-center justify-between gap-3 text-sm">
+                  <span>Rank applicants by Match Score</span>
+                  <Switch checked={f.rank_by_match} onCheckedChange={(v) => setF({ ...f, rank_by_match: v })} />
+                </label>
+                <label className="flex items-center justify-between gap-3 text-sm">
+                  <span>Auto-shortlist Top N candidates</span>
+                  <Switch checked={f.auto_shortlist_enabled} onCheckedChange={(v) => setF({ ...f, auto_shortlist_enabled: v })} />
+                </label>
+                {f.auto_shortlist_enabled && (
+                  <div className="flex items-center gap-2">
+                    <Label className="text-xs text-muted-foreground">Top</Label>
+                    <Input type="number" min="1" className="w-24 h-9" value={f.auto_shortlist_top_n} onChange={(e) => setF({ ...f, auto_shortlist_top_n: e.target.value })} />
+                    <span className="text-xs text-muted-foreground">applicants will be auto-shortlisted</span>
+                  </div>
+                )}
+              </div>
+
               <Button onClick={save} className="md:col-span-2 bg-grad-primary">Publish job</Button>
             </div>
           </DialogContent>
@@ -84,7 +138,7 @@ const CoordJobs = () => {
                 </div>
                 <div className="mt-3 flex flex-wrap gap-1">{(j.required_skills || []).slice(0, 5).map((s: string) => <Badge key={s} variant="secondary" className="text-xs font-normal">{s}</Badge>)}</div>
                 <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
-                  <span>CGPA ≥ {j.min_cgpa || 0}</span>
+                  <span>CGPA ≥ {j.min_cgpa || 0}{j.auto_shortlist_top_n ? ` · Auto-shortlist top ${j.auto_shortlist_top_n}` : ""}</span>
                   <Button size="sm" variant="ghost" onClick={() => remove(j.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                 </div>
               </CardContent>
