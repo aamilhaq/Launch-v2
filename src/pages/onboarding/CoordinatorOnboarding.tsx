@@ -12,13 +12,14 @@ import { FieldError } from "@/components/FieldError";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { isName, isPhoneForCountry } from "@/lib/validators";
+import { DEPARTMENTS } from "@/lib/departments";
 
 const CoordinatorOnboarding = () => {
   const { user } = useAuth();
   const nav = useNavigate();
   const [full_name, setFullName] = useState("");
   const [college, setCollege] = useState("");
-  const [department, setDepartment] = useState("");
+  const [department, setDepartment] = useState(DEPARTMENTS[0]);
   const [designation, setDesignation] = useState("Placement Coordinator");
   const [country, setCountry] = useState("+91");
   const [phone, setPhone] = useState("");
@@ -66,7 +67,12 @@ const CoordinatorOnboarding = () => {
               <FieldError msg={errors.college} />
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div><Label>Department</Label><Input className="mt-1.5" value={department} onChange={(e) => setDepartment(e.target.value)} /></div>
+              <div>
+                <Label>Department</Label>
+                <select value={department} onChange={(e) => setDepartment(e.target.value)} className="mt-1.5 w-full h-10 rounded-md border border-input bg-background px-3 text-sm">
+                  {DEPARTMENTS.map((d) => <option key={d}>{d}</option>)}
+                </select>
+              </div>
               <div><Label>Designation</Label><Input className="mt-1.5" value={designation} onChange={(e) => setDesignation(e.target.value)} /></div>
             </div>
             <div>
