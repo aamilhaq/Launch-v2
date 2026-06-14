@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { PageHeader, EmptyState } from "@/components/ui-bits";
 import { Briefcase, Building2, CalendarClock, MapPin, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { evaluateEligibility } from "@/lib/eligibility";
 
 type Job = any;
 
@@ -30,18 +31,6 @@ const Jobs = () => {
   };
   useEffect(() => { load(); }, [user]);
 
-  const checkEligibility = (j: Job) => {
-    if (!profile) return { eligible: false, reason: "Complete your profile first" };
-    if (j.min_cgpa && (profile.cgpa || 0) < j.min_cgpa) return { eligible: false, reason: `Requires CGPA ≥ ${j.min_cgpa}` };
-    if (j.eligible_departments?.length && !j.eligible_departments.includes(profile.department)) return { eligible: false, reason: `Limited to ${j.eligible_departments.join(", ")}` };
-    if (j.required_skills?.length) {
-      const have = new Set((profile.skills || []).map((s: string) => s.toLowerCase()));
-      const missing = j.required_skills.filter((s: string) => !have.has(s.toLowerCase()));
-      if (missing.length > j.required_skills.length / 2) return { eligible: false, reason: `Missing core skills: ${missing.slice(0, 3).join(", ")}` };
-    }
-    return { eligible: true, reason: "You meet all the criteria" };
-  };
-
   const apply = async (j: Job) => {
     if (!user) return;
     const { error } = await supabase.from("applications").insert({ job_id: j.id, student_id: user.id });
@@ -60,7 +49,7 @@ const Jobs = () => {
       ) : (
         <div className="grid md:grid-cols-2 gap-4">
           {jobs.map((j) => {
-            const e = checkEligibility(j);
+            const e = evaluateEligibility(j, profile);
             const applied = appliedIds.has(j.id);
             return (
               <Card key={j.id} className="shadow-elev border-border/60 hover:shadow-elev-lg transition-shadow">
@@ -85,9 +74,22 @@ const Jobs = () => {
                       {j.required_skills.slice(0, 6).map((s: string) => <Badge key={s} variant="secondary" className="text-xs font-normal">{s}</Badge>)}
                     </div>
                   )}
+
+                  {!e.eligible && (
+                    <ul className="mb-3 space-y-1">
+                      {e.reasons.map((r, i) => (
+                        <li key={i} className="text-xs text-destructive flex items-start gap-1.5">
+                          <XCircle className="h-3 w-3 mt-0.5 shrink-0" />{r}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">{e.reason}</span>
-                    <Button size="sm" onClick={() => apply(j)} disabled={!e.eligible || applied} className={!applied ? "bg-grad-primary" : ""}>
+                    <span className="text-xs text-muted-foreground">
+                      {e.eligible ? "You meet all the criteria" : `Skill match ${e.skillMatchPct}%`}
+                    </span>
+                    <Button size="sm" onClick={() => apply(j)} disabled={!e.eligible || applied} className={!applied && e.eligible ? "bg-grad-primary" : ""}>
                       {applied ? "Applied ✓" : "Apply"}
                     </Button>
                   </div>
