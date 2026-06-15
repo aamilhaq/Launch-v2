@@ -23,7 +23,8 @@ const QuizTake = () => {
     (async () => {
       const [{ data: q }, { data: qs }] = await Promise.all([
         supabase.from("quizzes").select("*").eq("id", id).maybeSingle(),
-        supabase.from("quiz_questions").select("*").eq("quiz_id", id).order("position"),
+        // correct_index is column-revoked for students — only fetch what the UI needs
+        supabase.from("quiz_questions").select("id, quiz_id, question, options, position").eq("quiz_id", id).order("position"),
       ]);
       setQuiz(q); setQuestions(qs || []);
       if (q) setTimeLeft(q.duration_minutes * 60);
@@ -39,13 +40,15 @@ const QuizTake = () => {
   const submit = async () => {
     if (!user || !quiz) return;
     setSubmitting(true);
-    const score = questions.reduce((acc, q) => acc + (answers[q.id] === q.correct_index ? 1 : 0), 0);
-    const { error } = await supabase.from("quiz_attempts").insert({
-      quiz_id: quiz.id, student_id: user.id, score, total: questions.length, answers,
+    // Server-side grading — keeps correct answers hidden from the client.
+    const { data, error } = await supabase.rpc("submit_quiz_attempt", {
+      _quiz_id: quiz.id,
+      _answers: answers as any,
     });
     setSubmitting(false);
     if (error) return toast.error(error.message);
-    toast.success(`You scored ${score} / ${questions.length}`);
+    const row = Array.isArray(data) ? data[0] : data;
+    toast.success(`You scored ${row?.score ?? 0} / ${row?.total ?? questions.length}`);
     nav("/student/quizzes");
   };
 

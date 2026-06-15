@@ -2,6 +2,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
+import { NotificationBell } from "@/components/NotificationBell";
 import {
   LayoutDashboard, Target, Briefcase, GraduationCap,
   BarChart3, Megaphone, Users, ClipboardList, LogOut, UserCircle,
@@ -66,11 +67,15 @@ export const AppShell = ({ variant }: { variant: "student" | "coordinator" }) =>
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="md:hidden h-14 bg-sidebar text-sidebar-foreground flex items-center justify-between px-4">
-          <Logo className="h-6" />
-          <Button variant="ghost" size="icon" onClick={async () => { await signOut(); nav("/"); }}>
-            <LogOut className="h-4 w-4" />
-          </Button>
+        <header className="h-14 bg-sidebar text-sidebar-foreground flex items-center justify-between px-4 md:px-6 md:bg-transparent md:text-foreground md:border-b md:border-border">
+          <div className="md:hidden"><Logo className="h-6" /></div>
+          <div className="hidden md:block text-sm text-muted-foreground">{user?.email}</div>
+          <div className="flex items-center gap-1">
+            <NotificationBell />
+            <Button variant="ghost" size="icon" className="md:hidden" onClick={async () => { await signOut(); nav("/"); }}>
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
         </header>
         <main className="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto">
           <Outlet />

@@ -402,6 +402,35 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_jobs: {
+        Row: {
+          created_at: string
+          id: string
+          job_id: string
+          student_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          job_id: string
+          student_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          job_id?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_jobs_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_profiles: {
         Row: {
           cgpa: number | null
@@ -500,6 +529,14 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      submit_quiz_attempt: {
+        Args: { _answers: Json; _quiz_id: string }
+        Returns: {
+          attempt_id: string
+          score: number
+          total: number
+        }[]
       }
     }
     Enums: {
