@@ -2,23 +2,35 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { PageHeader, EmptyState } from "@/components/ui-bits";
-import { ClipboardList, Check } from "lucide-react";
+import { ClipboardList, Check, X } from "lucide-react";
+import { toast } from "sonner";
 
 const STEPS = ["applied", "under_review", "shortlisted", "interview_scheduled", "selected"];
 const LABEL: Record<string, string> = {
   applied: "Applied", under_review: "Under Review", shortlisted: "Shortlisted",
   interview_scheduled: "Interview", selected: "Selected", rejected: "Rejected",
 };
+const WITHDRAWABLE = new Set(["applied", "under_review"]);
 
 const Applications = () => {
   const { user } = useAuth();
   const [apps, setApps] = useState<any[]>([]);
 
-  useEffect(() => {
+  const load = () => {
     if (!user) return;
     supabase.from("applications").select("*, jobs(title, company)").eq("student_id", user.id).order("created_at", { ascending: false }).then(({ data }) => setApps(data || []));
-  }, [user]);
+  };
+  useEffect(() => { load(); }, [user]);
+
+  const withdraw = async (id: string, title?: string) => {
+    if (!confirm(`Withdraw your application${title ? ` for ${title}` : ""}?`)) return;
+    const { error } = await supabase.from("applications").delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Application withdrawn");
+    load();
+  };
 
   return (
     <>
@@ -33,11 +45,16 @@ const Applications = () => {
             return (
               <Card key={a.id} className="shadow-elev border-border/60">
                 <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-5">
+                  <div className="flex items-start justify-between gap-3 mb-5 flex-wrap">
                     <div>
                       <h3 className="font-display font-semibold">{a.jobs?.title}</h3>
                       <div className="text-sm text-muted-foreground">{a.jobs?.company} · Applied {new Date(a.created_at).toLocaleDateString()}</div>
                     </div>
+                    {WITHDRAWABLE.has(a.status) && (
+                      <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => withdraw(a.id, a.jobs?.title)}>
+                        <X className="h-3.5 w-3.5 mr-1" /> Withdraw
+                      </Button>
+                    )}
                   </div>
                   {rejected ? (
                     <div className="text-sm font-medium text-destructive bg-destructive/10 px-3 py-2 rounded-md inline-block">Not selected</div>
