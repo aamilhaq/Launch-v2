@@ -19,25 +19,55 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!/^[^\s@]+@[^\s@]+\.edu\.in$/i.test(email.trim())) {
       return toast.error("Please use your university email ending in .edu.in");
     }
+    if (password.length < 8) {
+      return toast.error("Password must be at least 8 characters.");
+    }
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
       password,
       options: {
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: `${window.location.origin}/redirect`,
         data: { full_name: fullName, role },
       },
     });
     setLoading(false);
     if (error) return toast.error(error.message);
+    // If email confirmation is required, no session is returned.
+    if (!data.session) {
+      setPendingEmail(email.trim());
+      return;
+    }
     toast.success("Account created — let's set up your profile.");
     nav("/redirect");
   };
+
+  if (pendingEmail) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <Card className="max-w-md w-full border-border/60 shadow-elev">
+          <CardContent className="p-8 text-center">
+            <CheckCircle2 className="h-12 w-12 text-accent mx-auto mb-4" />
+            <h1 className="text-2xl font-display font-bold">Check your email</h1>
+            <p className="text-muted-foreground mt-2">
+              We sent a confirmation link to <span className="font-medium text-foreground">{pendingEmail}</span>.
+              Click it to activate your account, then come back to sign in.
+            </p>
+            <Link to="/login" className="inline-block mt-6 text-primary font-medium hover:underline">
+              Back to sign in
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex">
@@ -90,7 +120,8 @@ const Signup = () => {
               </div>
               <div>
                 <Label htmlFor="pw">Password</Label>
-                <Input id="pw" type="password" minLength={6} required value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1.5" />
+                <Input id="pw" type="password" minLength={8} required value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1.5" />
+                <p className="text-xs text-muted-foreground mt-1">Min 8 characters. Common/leaked passwords are blocked.</p>
               </div>
               <Button type="submit" disabled={loading} className="w-full bg-grad-primary h-11">
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create account"}
